@@ -7,27 +7,42 @@ Pri predmetu Analiza podatkov s programom R bom analiziral uporabo interneta v E
 
 Podatke za prvi 2 tabeli bom v csv obliki prenesel iz Eurostata:
 Podatki v tidy data:
-1. tabela: delež uporabnikov
+1. tabela: delež uporabnikov 
+
 1.1 stolpec: država EU 
+
 1.2 stolpec: leto
+
 1.3 stolpec: vrsta uporabe (doma, WI-FI)
+
 1.4 stolpec: delež
 
 2. tabela: nakupi
+
 2.1 stolpec: država EU
+
 2.2 stolpec: leto
+
 2.3 stolpec: kupovanje od doma/tujine
+
 2.4 stolpec: delež prebivalcev
 
+
 3. tabela: število uporabnikov Facebooka
+
 3.1 stolpec: država EU
+
 3.2 stolpec: število uporabnikov Facebooka
+vir: http://www.internetworldstats.com/stats9.htm
 
 4. tabela: razvitost držav
-4.1 stolpec: država EU
-4.2 stolpec: število prebivalcev
-4.3 stolpec: BDP na prebivalca
 
+4.1 stolpec: država EU
+
+4.2 stolpec: število prebivalcev
+
+4.3 stolpec: BDP na prebivalca
+vir: Wikipedia
 
 ## Program
 
