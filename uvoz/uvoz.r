@@ -1,54 +1,40 @@
-# 2. faza: Uvoz podatkov
+# 2. faza: uvoz podatkov
+tabela1<-read.csv("goods.csv",header=FALSE,encoding="Windows-1250",skip=2, nrows=43)
+ha<-select(tabela1, 1, seq(from=2, to=24, by=2))
+ha<-ha[-c(1, 2, 3, 4, 5, 6, 41),]
+colnames(ha)<-c("Drzava", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016")
+ha<-melt(ha,id=c("Drzava"))
+ha<-ha[order(ha$Drzava),]
+colnames(ha)<-c("Drzava", "Leto", "Kupovanje")
 
-sl <- locale("sl", decimal_mark = ",", grouping_mark = ".")
+#urejene tabele imajo imena "ha", "ha1", "uporaba", "wifi" in "zanima"
+tabela2<-read.csv("goods_tuj.csv", header=FALSE, encoding="Windows-1250", skip=3, nrows=42)
+ha1<-select(tabela2, 1, seq(from=2, to=18, by=2))
+colnames(ha1)<-c("Drzava", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016")
+ha1<-ha1[-c(1, 2, 3, 4, 5, 40),]
+ha1<-melt(ha1,id=c("Drzava"))
+ha1<-ha1[order(ha1$Drzava),]
+colnames(ha1)<-c("Drzava", "Leto", "Kupovanje-tujina")
 
-# Funkcija, ki uvozi občine iz Wikipedije
-uvozi.obcine <- function() {
-  link <- "http://sl.wikipedia.org/wiki/Seznam_ob%C4%8Din_v_Sloveniji"
-  stran <- html_session(link) %>% read_html()
-  tabela <- stran %>% html_nodes(xpath="//table[@class='wikitable sortable']") %>%
-    .[[1]] %>% html_table(dec = ",")
-  for (i in 1:ncol(tabela)) {
-    if (is.character(tabela[[i]])) {
-      Encoding(tabela[[i]]) <- "UTF-8"
-    }
-  }
-  colnames(tabela) <- c("obcina", "povrsina", "prebivalci", "gostota", "naselja",
-                        "ustanovitev", "pokrajina", "regija", "odcepitev")
-  tabela$obcina <- gsub("Slovenskih", "Slov.", tabela$obcina)
-  tabela$obcina[tabela$obcina == "Kanal ob Soči"] <- "Kanal"
-  tabela$obcina[tabela$obcina == "Loški potok"] <- "Loški Potok"
-  for (col in c("povrsina", "prebivalci", "gostota", "naselja", "ustanovitev")) {
-    tabela[[col]] <- parse_number(tabela[[col]], na = "-", locale = sl)
-  }
-  for (col in c("obcina", "pokrajina", "regija")) {
-    tabela[[col]] <- factor(tabela[[col]])
-  }
-  return(tabela)
-}
+tabela3<-read.csv("int_use.csv", header=FALSE, encoding="Windows-1250", skip=8, nrows=37)
+uporaba<-select(tabela3, 1, seq(from=2, to=24, by=2))
+colnames(uporaba)<-c("Drzava", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016")
+uporaba<-uporaba[-c(35),]
+uporaba<-melt(uporaba,id=c("Drzava"))
+uporaba<-uporaba[order(uporaba$Drzava),]
+colnames(uporaba)<-c("Drzava", "Leto", "Uporaba interneta")
 
-# Funkcija, ki uvozi podatke iz datoteke druzine.csv
-uvozi.druzine <- function(obcine) {
-  data <- read_csv2("podatki/druzine.csv", col_names = c("obcina", 1:4),
-                    locale = locale(encoding = "Windows-1250"))
-  data$obcina <- data$obcina %>% strapplyc("^([^/]*)") %>% unlist() %>%
-    strapplyc("([^ ]+)") %>% sapply(paste, collapse = " ") %>% unlist()
-  data$obcina[data$obcina == "Sveti Jurij"] <- "Sveti Jurij ob Ščavnici"
-  data <- data %>% melt(id.vars = "obcina", variable.name = "velikost.druzine",
-                        value.name = "stevilo.druzin")
-  data$velikost.druzine <- parse_number(data$velikost.druzine)
-  data$obcina <- factor(data$obcina, levels = obcine)
-  return(data)
-}
+tabela4<-read.csv("wifi.csv", header=FALSE, encoding="Windows-1250", skip=1, nrows=44)
+wifi<-select(tabela3, 1, seq(from=2, to=10, by=2))
+wifi<-wifi[-c(35),]
+colnames(wifi)<-c("Drzava", "2012", "2013", "2014", "2015", "2016")
+wifi<-melt(wifi,id=c("Drzava"))
+wifi<-wifi[order(wifi$Drzava),]
+colnames(wifi)<-c("Drzava", "Leto", "Uporaba WIFI")
 
-# Zapišimo podatke v razpredelnico obcine
-obcine <- uvozi.obcine()
-
-# Zapišimo podatke v razpredelnico druzine.
-druzine <- uvozi.druzine(levels(obcine$obcina))
-
-# Če bi imeli več funkcij za uvoz in nekaterih npr. še ne bi
-# potrebovali v 3. fazi, bi bilo smiselno funkcije dati v svojo
-# datoteko, tukaj pa bi klicali tiste, ki jih potrebujemo v
-# 2. fazi. Seveda bi morali ustrezno datoteko uvoziti v prihodnjih
-# fazah.
+scotusURL <- "https://en.wikipedia.org/wiki/List_of_European_countries_by_population"
+temp <- scotusURL %>% html %>% html_nodes("table")
+tabela5<-(html_table(temp[2], fill=TRUE))
+tabela5<-as.data.frame(tabela5)
+zanima<-select(tabela5, 2, 8)
+colnames(zanima)<-c("Drzava", "st. prebivalcev")
