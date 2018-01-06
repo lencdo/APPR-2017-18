@@ -1,6 +1,6 @@
 ---
 title: "Poročilo pri predmetu Analiza podatkov s programom R"
-author: "Študent FMF"
+author: "Peter Dolenc"
 output:
   html_document: default
   pdf_document:
@@ -21,7 +21,7 @@ source("lib/libraries.r", encoding = "UTF-8")
 
 # Izbira teme
 
-Za vzorec bomo prikazali nekaj podatkov o slovenskih občinah.
+Pri projektu bom preučil, koliko in v kakšni obliki ljudje iz Evropske Uniji uporabljajo internet. Moja hipoteza je, da ljudje v bolj razvitih državah uporabljajo internet več in preko interneta tudi več kupujejo. Z analizo podatkov bom želel to hipotezo potrditi ali ovreči.
 
 ***
 
@@ -31,26 +31,21 @@ Za vzorec bomo prikazali nekaj podatkov o slovenskih občinah.
 source("uvoz/uvoz.r", encoding = "UTF-8")
 ```
 
-Uvozili smo podatke o občinah v obliki CSV s statističnega urada ter v obliki HTML
-z Wikipedije. Podatke imamo v dveh razpredelnicah v obliki *tidy data*.
+Uvozili sem podatke o državah EU v obliki CSV iz spletnega portala "eurostat" ter v obliki HTML z Wikipedije. Podatke imamo v 4 razpredelnicah v obliki *tidy data*.
 
-1. `druzine` - podatki o družinah za vsako občino
-  - `obcina` - spremenljivka: ime občine (neurejen faktor),
-  - `velikost.druzine` - spremenljivka: število otrok v družini (število: 1, 2, 3 ali 4, kjer zadnja vrednost pomeni 4 ali več),
-  - `stevilo.druzin` - meritev: število družin z ustreznim številom otrok v ustrezni občini (število).
+Podatki v tidy data:
+1. tabela: delež uporabnikov 
+stolpci: država EU, leto, vrsta uporabe (doma, WI-FI), delež
 
-2. `obcine` - podatki o občinah
-  - `obcina` - spremenljivka: ime občine (neurejen faktor),
-  - `povrsina` - meritev: površina občine v km$^2$ (število),
-  - `prebivalci` - meritev: prebivalstvo občine (število),
-  - `gostota` - meritev: število prebivalcev na km$^2$ (število),
-  - `naselja` - meritev: število naselij v občini (število),
-  - `ustanovitev` - meritev: leto ustanovitve občine (število),
-  - `pokrajina` - meritev: pokrajina, ki ji občina pripada (neurejen faktor),
-  - `regija` - meritev: regija, ki ji občina pripada (neurejen faktor),
-  - `odcepitev` - meritev: podatki o občinah, od katerih se je občina odcepila (besedilo).
+2. tabela: nakupi
+stolpci: država EU, leto, doma ali v tujini, delež
 
-**Opomba**: da bi razpredelnica `obcine` res bila v obliki *tidy data*, bi morali odstraniti stolpec `gostota` (saj je izpeljan iz stolpcev `povrsina` in `prebivalci`), podatke o pokrajinah pa bi morali premakniti v drugo razpredelnico, saj nekatere občine pripadajo dvema pokrajinama. Podobno bi morali narediti tudi s stolpcem `odcepitev`.
+3. tabela: število uporabnikov Facebooka
+stolpci: država EU, število uporabnikov Facebooka
+
+4. tabela: razvitost držav
+stolpci: država EU, število prebivalcev, BDP na prebivalca
+
 
 Spodnji graf prikazuje porazdelitev števila naselij v občinah.
 
