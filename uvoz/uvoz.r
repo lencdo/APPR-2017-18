@@ -1,4 +1,4 @@
-#smo brez liechtensteina, albanije, rvest, reshape, dplyr, gridEXTRA
+#smo brez liechtensteina, albanije, rvest, reshape, dplyr, gridEXTRA, ggplot2
 # 2. faza: uvoz podatkov
 tabela1<-read.csv("podatki/goods.csv",header=FALSE,encoding="Windows-1250",skip=2, nrows=43)
 ha<-select(tabela1, 1, seq(from=2, to=24, by=2))
@@ -62,6 +62,7 @@ se$`Uporaba WIFI`<-as.character(se$`Uporaba WIFI`)
 se$`Uporaba WIFI`<-as.integer(se$`Uporaba WIFI`)
 se$"skupaj"<-(se$`Uporaba interneta`/100)*se$`st. prebivalcev`
 se$"skupajwifi"<-(se$`Uporaba WIFI`/100)*se$`st. prebivalcev`
+se$Leto<-as.numeric(se$Leto)
 
 novvek<-function(se, stolp){
   matrika<-matrix(nrow=5, ncol=2)
@@ -80,6 +81,7 @@ ide<-ide*100
 ide$leto<-ide$leto/100
 luxemburg<-subset(se, se$Drzava=="Luxembourg")
 luxemburg<-select(luxemburg, 2, 3, 4)
+
 turcija<-subset(se, se$Drzava=="Turkey")
 turcija<-select(turcija, 2, 3, 4)
 slovaska<-subset(se, se$Drzava=="Slovakia")
@@ -95,5 +97,17 @@ graf3<-ggplot()+geom_line(data=turcija, aes(x=turcija$Leto, y=turcija$`Uporaba i
 graf2<-ggplot()+geom_line(data=luxemburg, aes(x=luxemburg$Leto, y=luxemburg$`Uporaba interneta`, group=1), colour="red")+geom_line(data=luxemburg, aes(x=luxemburg$Leto, y=luxemburg$`Uporaba WIFI`, group=1), colour="blue")+
   ggtitle("Luksemburg")+labs(x="Leto", y="Delez uporabnikov v %")+coord_cartesian(ylim = c(0, 100)) 
 
+regresija<-function(tabela){
+  lel<-unique(tabela$"Drzava")
+  kek<-rep(NA, length(lel))
+  for(i in 1:length(lel)){
+    vnos<-lm(`Uporaba interneta` ~ Leto , data=tabela, subset=(tabela$"Drzava"==lel[i]))
+    kek[i]<-coef(vnos)[2]
+  }
+  rezultat<-data.frame(lel, kek)
+  colnames(rezultat)<-c("Drzava", "Koeficient")
+  return(rezultat)
+}
 
+regres<-regresija(se)
 #grid.arrange(graf1, graf2, graf3, graf4)

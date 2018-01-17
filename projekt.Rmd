@@ -7,7 +7,6 @@ output:
     includes:
       in_header: lib/styles.sty
     latex_engine: xelatex
-runtime: shiny
 ---
 
 ```{r setup, echo=FALSE, results='hide', message=FALSE}
@@ -31,7 +30,7 @@ Pri projektu bom preučil, koliko in v kakšni obliki ljudje iz Evropske Uniji u
 source("uvoz/uvoz.r", encoding = "UTF-8")
 ```
 
-Uvozili sem podatke o državah EU v obliki CSV iz spletnega portala "eurostat" ter v obliki HTML z Wikipedije. Podatke imamo v 4 razpredelnicah v obliki *tidy data*.
+Uvozil sem podatke o državah EU v obliki CSV iz spletnega portala "eurostat" ter v obliki HTML z Wikipedije. Podatke imamo v 4 razpredelnicah v obliki *tidy data*.
 
 Podatki v tidy data:
 1. tabela: delež uporabnikov 
@@ -47,52 +46,28 @@ stolpci: država EU, število uporabnikov Facebooka
 stolpci: država EU, število prebivalcev, BDP na prebivalca
 
 
-Spodnji graf prikazuje porazdelitev števila naselij v občinah.
 
-```{r histogram, echo=FALSE, message=FALSE, fig.align='center', fig.cap='Histogram števila naselij v občinah'}
-ggplot(obcine, aes(x = naselja)) + geom_histogram() +
-  ggtitle("Pogostost števila naselij") + xlab("Število naselij") + ylab("Število občin")
-```
+<!-- *** -->
 
-***
+<!-- # Analiza in vizualizacija podatkov -->
 
-# Analiza in vizualizacija podatkov
+<!-- ```{r vizualizacija, echo=FALSE, message=FALSE, warning=FALSE} -->
+<!-- source("vizualizacija/vizualizacija.r", encoding = "UTF-8") -->
+<!-- ``` -->
 
-```{r vizualizacija, echo=FALSE, message=FALSE, warning=FALSE}
-source("vizualizacija/vizualizacija.r", encoding = "UTF-8")
-```
-
-Spodnji zemljevid prikazuje povprečno velikost družine za vsako občino.
-
-```{r zemljevid, echo=FALSE, fig.align='center', fig.cap='Zemljevid povprečnega števila otrok v družini'}
-ggplot() + geom_polygon(data = left_join(zemljevid, povprecja, by = c("OB_UIME" = "obcina")),
-                        aes(x = long, y = lat, group = group, fill = povprecje)) +
-  ggtitle("Povprečno število otrok v družini") + xlab("") + ylab("") +
-  guides(fill = guide_colorbar(title = "Povprečje"))
-```
+Spodnji grafi prikazujejo krivuljo rasti uporabe interneta skozi čas. Prvi prikazuje rast po celotni Evropi, drugi v Slovaški, ki se kot država najbolj približuje povprečkju, tretji v Turčiji, kjer internet uporabljajo najmanj in zadnji Luksemburg, kjer internet uporabljajo največ.
 
 ***
-
-# Napredna analiza podatkov
-
-```{r analiza, echo=FALSE, message=FALSE}
-source("analiza/analiza.r", encoding = "UTF-8")
+```{r grafi, echo=FALSE, fig.align='center', fig.cap='Graf uporabe interneta po letih za celotno Evropo, Slovaško, Turčijo in Luksembug'}
+graf1<-ggplot()+geom_line(data=ide, aes(x=ide$leto, y=ide$`stevilo uporabnikov`, group=1), colour="red")+geom_line(data=ide, aes(x=ide$leto, y=ide$`stevilo uporabnikovwifi`, group=1), colour="blue")+
+  ggtitle("Drzave EU skupaj")+labs(x="Leto", y="Delez uporabnikov v %")+coord_cartesian(ylim = c(0, 100))+geom_text(aes(82, x=2015), label="INTERNET", colour="red")+geom_text(aes(y=50, x=2015), label="WIFI", colour="blue")
+graf4<-ggplot()+geom_line(data=slovaska, aes(x=slovaska$Leto, y=slovaska$`Uporaba interneta`, group=1), colour="red")+geom_line(data=slovaska, aes(x=slovaska$Leto, y=slovaska$`Uporaba WIFI`, group=1), colour="blue")+
+  ggtitle("Slovaska")+labs(x="Leto", y="Delez uporabnikov v %")+coord_cartesian(ylim = c(0, 100)) 
+graf3<-ggplot()+geom_line(data=turcija, aes(x=turcija$Leto, y=turcija$`Uporaba interneta`, group=1), colour="red")+geom_line(data=turcija, aes(x=turcija$Leto, y=turcija$`Uporaba WIFI`, group=1), colour="blue")+
+  ggtitle("Turcija")+labs(x="Leto", y="Delez uporabnikov v %")+coord_cartesian(ylim = c(0, 100)) 
+graf2<-ggplot()+geom_line(data=luxemburg, aes(x=luxemburg$Leto, y=luxemburg$`Uporaba interneta`, group=1), colour="red")+geom_line(data=luxemburg, aes(x=luxemburg$Leto, y=luxemburg$`Uporaba WIFI`, group=1), colour="blue")+
+  ggtitle("Luksemburg")+labs(x="Leto", y="Delez uporabnikov v %")+coord_cartesian(ylim = c(0, 100)) 
+grid.arrange(graf1, graf2, graf3, graf4)
 ```
 
-Spodnji graf prikazuje povezavo med številom naselij in površino občine.
 
-```{r graf, echo=FALSE, fig.align='center', fig.cap='Povezava med številom naselij in površino občine'}
-ggplot(inner_join(obcine, data.frame(obcina = names(skupine),
-                                     skupina = factor(skupine)), by = "obcina")
-, aes(x = povrsina, y = naselja, color = skupina, size = prebivalci/1000)) + geom_point() +
-  ggtitle("Število naselij glede na površino občine") +
-  xlab(expression("Površina (km"^2 * ")")) + ylab("Št. naselij") +
-  guides(color = guide_legend(title = "Skupina"),
-         size = guide_legend(title = "Prebivalci (* 1000)"))
-```
-
-***
-
-```{r shiny, echo = FALSE}
-shinyAppDir("shiny", options=list(width="100%", height=600))
-```
