@@ -9,7 +9,7 @@ output:
     latex_engine: xelatex
 ---
 
-```{r setup, echo=FALSE, results='hide', message=FALSE}
+```{r setup, echo=FALSE, results='hide', message=FALSE, warning = FALSE}
 # Če želimo nastaviti pisave v PDF-ju, odkomentiramo
 # in sledimo navodilom v programu.
 #source("fontconfig.r", encoding = "UTF-8")
@@ -26,7 +26,7 @@ Pri projektu bom preučil, koliko in v kakšni obliki ljudje iz Evropske Uniji u
 
 # Obdelava, uvoz in čiščenje podatkov
 
-```{r uvoz, echo=FALSE, message=FALSE}
+```{r uvoz, echo=FALSE, message=FALSE, warning = FALSE}
 source("uvoz/uvoz.r", encoding = "UTF-8")
 ```
 
@@ -58,7 +58,7 @@ stolpci: država EU, število prebivalcev, BDP na prebivalca
 Spodnji grafi prikazujejo krivuljo rasti uporabe interneta skozi čas. Prvi prikazuje rast po celotni Evropi, drugi v Slovaški, ki se kot država najbolj približuje povprečkju, tretji v Turčiji, kjer internet uporabljajo najmanj in zadnji Luksemburg, kjer internet uporabljajo največ.
 
 ***
-```{r grafi, echo=FALSE, fig.align='center', fig.cap='Graf uporabe interneta po letih za celotno Evropo, Slovaško, Turčijo in Luksembug'}
+```{r grafi, echo=FALSE, fig.align='center',  warning = FALSE, fig.cap='Graf uporabe interneta po letih za celotno Evropo, Slovaško, Turčijo in Luksembug'}
 graf1<-ggplot()+geom_line(data=ide, aes(x=ide$leto, y=ide$`stevilo uporabnikov`, group=1), colour="red")+geom_line(data=ide, aes(x=ide$leto, y=ide$`stevilo uporabnikovwifi`, group=1), colour="blue")+
   ggtitle("Drzave EU skupaj")+labs(x="Leto", y="Delez uporabnikov v %")+coord_cartesian(ylim = c(0, 100))+geom_text(aes(82, x=2015), label="INTERNET", colour="red")+geom_text(aes(y=50, x=2015), label="WIFI", colour="blue")
 graf4<-ggplot()+geom_line(data=slovaska, aes(x=slovaska$Leto, y=slovaska$`Uporaba interneta`, group=1), colour="red")+geom_line(data=slovaska, aes(x=slovaska$Leto, y=slovaska$`Uporaba WIFI`, group=1), colour="blue")+

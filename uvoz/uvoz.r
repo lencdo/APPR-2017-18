@@ -1,25 +1,25 @@
 #smo brez liechtensteina, albanije, rvest, reshape, dplyr, gridEXTRA, ggplot2
 # 2. faza: uvoz podatkov
 tabela1<-read.csv("podatki/goods.csv",header=FALSE,encoding="Windows-1250",skip=2, nrows=43)
-ha<-select(tabela1, 1, seq(from=2, to=24, by=2))
-ha<-ha[-c(1, 2, 3, 4, 5, 6, 36, 41),]
-colnames(ha)<-c("Drzava", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016")
-ha$Drzava<-as.character(ha$Drzava)
-ha$Drzava[ha$Drzava=="Former Yugoslav Republic of Macedonia, the"]<-"Macedonia"
-ha<-melt(ha,id=c("Drzava"))
-ha<-ha[order(ha$Drzava),]
-colnames(ha)<-c("Drzava", "Leto", "Kupovanje")
+kupovanje<-select(tabela1, 1, seq(from=2, to=24, by=2))
+kupovanje<-kupovanje[-c(1, 2, 3, 4, 5, 6, 36, 41),]
+colnames(kupovanje)<-c("Drzava", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016")
+kupovanje$Drzava<-as.character(kupovanje$Drzava)
+kupovanje$Drzava[kupovanje$Drzava=="Former Yugoslav Republic of Macedonia, the"]<-"Macedonia"
+kupovanje<-melt(kupovanje,id=c("Drzava"))
+kupovanje<-kupovanje[order(kupovanje$Drzava),]
+colnames(kupovanje)<-c("Drzava", "Leto", "Kupovanje")
 
 #urejene tabele imajo imena "ha", "ha1", "uporaba", "wifi" in "zanima"
 tabela2<-read.csv("podatki/goods_tuj.csv", header=FALSE, encoding="Windows-1250", skip=3, nrows=42)
-ha1<-select(tabela2, 1, seq(from=2, to=18, by=2))
-colnames(ha1)<-c("Drzava", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016")
-ha1<-ha1[-c(1, 2, 3, 4, 5, 35, 40),]
-ha1<-melt(ha1,id=c("Drzava"))
-ha1<-ha1[order(ha1$Drzava),]
-ha1$Drzava<-as.character(ha1$Drzava)
-ha1$Drzava[ha1$Drzava=="Former Yugoslav Republic of Macedonia, the "]<-"Macedonia"
-colnames(ha1)<-c("Drzava", "Leto", "Kupovanje-tujina")
+kupovanjeT<-select(tabela2, 1, seq(from=2, to=18, by=2))
+colnames(kupovanjeT)<-c("Drzava", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016")
+kupovanjeT<-kupovanjeT[-c(1, 2, 3, 4, 5, 35, 40),]
+kupovanjeT<-melt(kupovanjeT,id=c("Drzava"))
+kupovanjeT<-kupovanjeT[order(kupovanjeT$Drzava),]
+kupovanjeT$Drzava<-as.character(kupovanjeT$Drzava)
+kupovanjeT$Drzava[kupovanjeT$Drzava=="Former Yugoslav Republic of Macedonia, the "]<-"Macedonia"
+colnames(kupovanjeT)<-c("Drzava", "Leto", "Kupovanje-tujina")
 
 tabela3<-read.csv("podatki/int_use.csv", header=FALSE, encoding="Windows-1250", skip=8, nrows=37)
 uporaba<-select(tabela3, 1, seq(from=2, to=24, by=2))
@@ -51,6 +51,15 @@ zanima$Drzava[zanima$Drzava=="France[7][Note 1]"]<-"France"
 zanima$Drzava<-as.character(zanima$Drzava)
 zanima$`st. prebivalcev`<-as.integer(gsub(",", "", zanima$`st. prebivalcev`))
 
+scotusURL2 <- "https://en.wikipedia.org/wiki/List_of_sovereign_states_in_Europe_by_GDP_(nominal)_per_capita"
+temp2 <- scotusURL2 %>% html %>% html_nodes("table")
+tabela6<-(html_table(temp2[1], fill=TRUE))
+tabela6<-as.data.frame(tabela6)
+zanima1<-select(tabela6, 1, 3)
+colnames(zanima1)<-c("Drzava", "GDP pc")
+zanima1$Drzava<-as.character(zanima1$Drzava)
+zanima1$`GDP pc`<-as.numeric(gsub(",", ".", zanima1$`GDP pc`))
+
 # poglejmo kaj se dogaja pri uporabi, zanima nas od wifi dalje
 nova<-left_join(uporaba, wifi)
 nova<-subset(nova, nova$Leto>=2012)
@@ -72,11 +81,11 @@ novvek<-function(se, stolp){
   }
   return(matrika)
 }
-idemo<-as.data.frame(novvek(se, 6))
+skupnoEU<-as.data.frame(novvek(se, 6))
 idemowifi<-as.data.frame(novvek(se, 7))
-colnames(idemo)<-c("leto", "stevilo uporabnikov")
+colnames(skupnoEU)<-c("leto", "stevilo uporabnikov")
 colnames(idemowifi)<-c("leto", "stevilo uporabnikovwifi")
-ide<-left_join(idemo, idemowifi, by="leto")
+ide<-left_join(skupnoEU, idemowifi, by="leto")
 ide<-ide*100
 ide$leto<-ide$leto/100
 luxemburg<-subset(se, se$Drzava=="Luxembourg")
@@ -86,16 +95,6 @@ turcija<-subset(se, se$Drzava=="Turkey")
 turcija<-select(turcija, 2, 3, 4)
 slovaska<-subset(se, se$Drzava=="Slovakia")
 slovaska<-select(slovaska, 2, 3, 4)
-turcija<-select(slovaska, 2, 3, 4)
-
-graf1<-ggplot()+geom_line(data=ide, aes(x=ide$leto, y=ide$`stevilo uporabnikov`, group=1), colour="red")+geom_line(data=ide, aes(x=ide$leto, y=ide$`stevilo uporabnikovwifi`, group=1), colour="blue")+
-  ggtitle("Drzave EU skupaj")+labs(x="Leto", y="Delez uporabnikov v %")+coord_cartesian(ylim = c(0, 100))+geom_text(aes(82, x=2015), label="INTERNET", colour="red")+geom_text(aes(y=50, x=2015), label="WIFI", colour="blue")
-graf4<-ggplot()+geom_line(data=slovaska, aes(x=slovaska$Leto, y=slovaska$`Uporaba interneta`, group=1), colour="red")+geom_line(data=slovaska, aes(x=slovaska$Leto, y=slovaska$`Uporaba WIFI`, group=1), colour="blue")+
-  ggtitle("Slovaska")+labs(x="Leto", y="Delez uporabnikov v %")+coord_cartesian(ylim = c(0, 100)) 
-graf3<-ggplot()+geom_line(data=turcija, aes(x=turcija$Leto, y=turcija$`Uporaba interneta`, group=1), colour="red")+geom_line(data=turcija, aes(x=turcija$Leto, y=turcija$`Uporaba WIFI`, group=1), colour="blue")+
-  ggtitle("Turcija")+labs(x="Leto", y="Delez uporabnikov v %")+coord_cartesian(ylim = c(0, 100)) 
-graf2<-ggplot()+geom_line(data=luxemburg, aes(x=luxemburg$Leto, y=luxemburg$`Uporaba interneta`, group=1), colour="red")+geom_line(data=luxemburg, aes(x=luxemburg$Leto, y=luxemburg$`Uporaba WIFI`, group=1), colour="blue")+
-  ggtitle("Luksemburg")+labs(x="Leto", y="Delez uporabnikov v %")+coord_cartesian(ylim = c(0, 100)) 
 
 regresija<-function(tabela){
   lel<-unique(tabela$"Drzava")
@@ -109,5 +108,30 @@ regresija<-function(tabela){
   return(rezultat)
 }
 
+spremen<-function(vektor){
+  out<-as.character(vektor)
+  out<-as.numeric(vektor)
+  return(out)
+}
+
+
 regres<-regresija(se)
+
+ledux<-subset(uporaba, uporaba$Leto==2016) %>% select(1,3)
+ledux2<-subset(kupovanje, kupovanje$Leto==2016) %>% select(1,3)
+ledux3<-subset(kupovanjeT, kupovanjeT$Leto==2016) %>% select(1,3)
+rezultati<-inner_join(ledux, ledux2,by="Drzava") %>% inner_join(ledux3, by="Drzava")%>% 
+  inner_join(regres, by="Drzava") %>% inner_join(zanima, by="Drzava") %>% inner_join(zanima1, by="Drzava")
+rezultati<-subset(rezultati, rezultati$Drzava!="Iceland")%>% select(2, 3, 4, 5, 6, 7)
+rezultati$`Uporaba interneta`<-as.character(rezultati$`Uporaba interneta`)
+rezultati$`Uporaba interneta`<-as.numeric(rezultati$`Uporaba interneta`)
+rezultati$`Kupovanje`<-as.character(rezultati$`Kupovanje`)
+rezultati$`Kupovanje`<-as.numeric(rezultati$`Kupovanje`)
+rezultati$`Kupovanje-tujina`<-as.character(rezultati$`Kupovanje-tujina`)
+rezultati$`Kupovanje-tujina`<-as.numeric(rezultati$`Kupovanje-tujina`)
+rezultati$`st. prebivalcev`<-as.numeric(rezultati$`st. prebivalcev`)
+cor(rezultati)
+
+korelacija<-left_join(regres, zanima1, by="Drzava")
+koeficjent<-cor(korelacija$Koeficient, korelacija$`GDP pc`)
 #grid.arrange(graf1, graf2, graf3, graf4)
