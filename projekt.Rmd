@@ -70,4 +70,19 @@ graf2<-ggplot()+geom_line(data=luxemburg, aes(x=luxemburg$Leto, y=luxemburg$`Upo
 grid.arrange(graf1, graf2, graf3, graf4)
 ```
 
+```{r uvozi.zem, echo=FALSE, message=FALSE, warning = FALSE}
+source("lib/uvozi.zemljevid.r", encoding = "UTF-8")
+```
 
+```{r vizualizacija, echo=FALSE, message=FALSE, warning = FALSE}
+source("vizualizacija/vizualizacija.r", encoding = "UTF-8")
+```
+
+Na spodnjem zemljevidu si oglejmo uporabo interneta v letu 2016 po državah. Sive točke na državah pokažejo, kako hitro je v zadnjih letih 
+naraščalo število prebivalcev, ki so uporabljali internet. Rast je bila večja v državah z vejimi točkami in manjša v državah z manjšimi točkami. Opazimo (pričakovano), da so države, v katerih že zdaj veliko uporaljajo internet, rastle počasneje kot razvijajoče.
+
+***
+```{r zemljevid, echo=FALSE, fig.align='center',  warning = FALSE, fig.cap='Zemljevid porabe interneta v Evropi'} 
+zema <- ggplot() + geom_polygon(data = tess ,aes(x = long, y = lat, group = group), fill=tess$`Uporaba interneta`)+coord_map()+geom_point(data=tess, aes(x=long, y=lat,group=1,fill=1, size=tess$Koeficient), color="gray")+coord_map(xlim = c(-25, 40), ylim = c(32, 72))+scale_size(name="T",range=c(0.2,1)) +scale_fill_identity(na.value = "white")
+print(zema)
+```

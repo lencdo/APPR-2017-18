@@ -47,7 +47,7 @@ tabela5<-(html_table(temp[2], fill=TRUE))
 tabela5<-as.data.frame(tabela5)
 zanima<-select(tabela5, 2, 8)
 colnames(zanima)<-c("Drzava", "st. prebivalcev")
-zanima$Drzava[zanima$Drzava=="France[7][Note 1]"]<-"France"
+zanima$Drzava[zanima$Drzava=="France[6][Note 1]"]<-"France"
 zanima$Drzava<-as.character(zanima$Drzava)
 zanima$`st. prebivalcev`<-as.integer(gsub(",", "", zanima$`st. prebivalcev`))
 
@@ -108,13 +108,6 @@ regresija<-function(tabela){
   return(rezultat)
 }
 
-spremen<-function(vektor){
-  out<-as.character(vektor)
-  out<-as.numeric(vektor)
-  return(out)
-}
-
-
 regres<-regresija(se)
 
 ledux<-subset(uporaba, uporaba$Leto==2016) %>% select(1,3)
@@ -132,6 +125,18 @@ rezultati$`Kupovanje-tujina`<-as.numeric(rezultati$`Kupovanje-tujina`)
 rezultati$`st. prebivalcev`<-as.numeric(rezultati$`st. prebivalcev`)
 cor(rezultati)
 
-korelacija<-left_join(regres, zanima1, by="Drzava")
+uvozimo <- uvozi.zemljevid("http://www.naturalearthdata.com/http//www.naturalearthdata.com/download/50m/cultural/ne_50m_admin_0_countries.zip",
+                           "ne_50m_admin_0_countries", 
+                           encoding = "UTF-8")
+evropa<-pretvori.zemljevid(uvozimo)
+
+#kapadia<-left_join(evropap, korelacija, by=c("SOVEREIGNT" = "Drzava"))
+korelacija<-left_join(regres, zanima1)
 koeficjent<-cor(korelacija$Koeficient, korelacija$`GDP pc`)
+
+koncno<-left_join(evropa, ledux, by=c("SOVEREIGNT" = "Drzava"))
+koncno$`Uporaba interneta`<-as.character(koncno$`Uporaba interneta`)
+koncno$`Uporaba interneta`<-as.numeric(koncno$`Uporaba interneta`)
+tess<-left_join(koncno, korelacija, by=c("SOVEREIGNT" = "Drzava"))
+#dzojnano<-left_join(evropa, korelacija)
 #grid.arrange(graf1, graf2, graf3, graf4)

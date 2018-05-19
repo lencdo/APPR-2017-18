@@ -1,13 +1,24 @@
 # 3. faza: Vizualizacija podatkov
 
 # Uvozimo zemljevid.
-zemljevid <- uvozi.zemljevid("http://baza.fmf.uni-lj.si/OB.zip",
-                             "OB/OB", encoding = "Windows-1250")
-levels(zemljevid$OB_UIME) <- levels(zemljevid$OB_UIME) %>%
-  { gsub("Slovenskih", "Slov.", .) } %>% { gsub("-", " - ", .) }
-zemljevid$OB_UIME <- factor(zemljevid$OB_UIME, levels = levels(obcine$obcina))
-zemljevid <- pretvori.zemljevid(zemljevid)
+#uvozimo <- uvozi.zemljevid("http://www.naturalearthdata.com/http//www.naturalearthdata.com/download/50m/cultural/ne_50m_admin_0_countries.zip",
+#                          "ne_50m_admin_0_countries", 
+#                          encoding = "UTF-8")
+#evropa<-pretvori.zemljevid(uvozimo)
+uvozimo <- uvozi.zemljevid("http://www.naturalearthdata.com/http//www.naturalearthdata.com/download/50m/cultural/ne_50m_admin_0_countries.zip",
+                           "ne_50m_admin_0_countries", 
+                           encoding = "UTF-8")
+evropa<-pretvori.zemljevid(uvozimo)
 
-# Izračunamo povprečno velikost družine
-povprecja <- druzine %>% group_by(obcina) %>%
-  summarise(povprecje = sum(velikost.druzine * stevilo.druzin) / sum(stevilo.druzin))
+korelacija<-left_join(regres, zanima1)
+koeficjent<-cor(korelacija$Koeficient, korelacija$`GDP pc`)
+
+koncno<-left_join(evropa, ledux, by=c("SOVEREIGNT" = "Drzava"))
+koncno$`Uporaba interneta`<-as.character(koncno$`Uporaba interneta`)
+koncno$`Uporaba interneta`<-as.numeric(koncno$`Uporaba interneta`)
+tess<-left_join(koncno, korelacija, by=c("SOVEREIGNT" = "Drzava"))
+
+koncno<-left_join(evropa, ledux, by=c("SOVEREIGNT" = "Drzava"))
+koncno$`Uporaba interneta`<-as.character(koncno$`Uporaba interneta`)
+koncno$`Uporaba interneta`<-as.numeric(koncno$`Uporaba interneta`)
+#zem <- ggplot() + geom_polygon(data = koncno ,aes(x = long, y = lat, group = group), fill=koncno$`Uporaba interneta`) +coord_map(xlim = c(-25, 40), ylim = c(32, 72)) + scale_fill_identity(na.value = "white")
