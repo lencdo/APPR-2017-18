@@ -17,5 +17,3 @@ koncno<-left_join(evropa, ledux, by=c("SOVEREIGNT" = "Drzava"))
 koncno$`Uporaba interneta`<-as.character(koncno$`Uporaba interneta`)
 koncno$`Uporaba interneta`<-as.numeric(koncno$`Uporaba interneta`)
 tess<-left_join(koncno, regresijski_koef, by=c("SOVEREIGNT" = "Drzava"))
-
-#zem <- ggplot() + geom_polygon(data = koncno ,aes(x = long, y = lat, group = group), fill=koncno$`Uporaba interneta`) +coord_map(xlim = c(-25, 40), ylim = c(32, 72)) + scale_fill_identity(na.value = "white")

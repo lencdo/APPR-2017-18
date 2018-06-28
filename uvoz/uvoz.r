@@ -115,7 +115,7 @@ ledux2<-subset(kupovanje, kupovanje$Leto==2016) %>% select(1,3)
 ledux3<-subset(kupovanjeT, kupovanjeT$Leto==2016) %>% select(1,3)
 rezultati<-inner_join(ledux, ledux2,by="Drzava") %>% inner_join(ledux3, by="Drzava")%>% 
   inner_join(regres, by="Drzava") %>% inner_join(zanima, by="Drzava") %>% inner_join(zanima1, by="Drzava")
-rezultati<-subset(rezultati, rezultati$Drzava!="Iceland")%>% select(2, 3, 4, 5, 6, 7)
+rezultati<-subset(rezultati, rezultati$Drzava!="Iceland") #%>% select(2, 3, 4, 5, 6, 7)
 rezultati$`Uporaba interneta`<-as.character(rezultati$`Uporaba interneta`)
 rezultati$`Uporaba interneta`<-as.numeric(rezultati$`Uporaba interneta`)
 rezultati$`Kupovanje`<-as.character(rezultati$`Kupovanje`)
@@ -123,8 +123,6 @@ rezultati$`Kupovanje`<-as.numeric(rezultati$`Kupovanje`)
 rezultati$`Kupovanje-tujina`<-as.character(rezultati$`Kupovanje-tujina`)
 rezultati$`Kupovanje-tujina`<-as.numeric(rezultati$`Kupovanje-tujina`)
 rezultati$`st. prebivalcev`<-as.numeric(rezultati$`st. prebivalcev`)
-cor(rezultati)
-
 
 #kapadia<-left_join(evropap, korelacija, by=c("SOVEREIGNT" = "Drzava"))
 

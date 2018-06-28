@@ -67,22 +67,54 @@ graf3<-ggplot()+geom_line(data=turcija, aes(x=turcija$Leto, y=turcija$`Uporaba i
   ggtitle("Turcija")+labs(x="Leto", y="Delez uporabnikov v %")+coord_cartesian(ylim = c(0, 100)) 
 graf2<-ggplot()+geom_line(data=luxemburg, aes(x=luxemburg$Leto, y=luxemburg$`Uporaba interneta`, group=1), colour="red")+geom_line(data=luxemburg, aes(x=luxemburg$Leto, y=luxemburg$`Uporaba WIFI`, group=1), colour="blue")+
   ggtitle("Luksemburg")+labs(x="Leto", y="Delez uporabnikov v %")+coord_cartesian(ylim = c(0, 100)) 
-grid.arrange(graf1, graf2, graf3, graf4)
+grid.arrange(graf1, graf4, graf3, graf2)
 ```
 
-```{r uvozi.zem, echo=FALSE, message=FALSE, warning = FALSE}
+```{r uvozi.zem, echo=FALSE, message=FALSE, fig.align='center', warning = FALSE}
 source("lib/uvozi.zemljevid.r", encoding = "UTF-8")
 ```
 
-```{r vizualizacija, echo=FALSE, message=FALSE, warning = FALSE}
+Na spodnjem zemljevidu si oglejmo uporabo interneta v letu 2016 po državah. Sive točke na državah pokažejo, kako je v zadnjih letih 
+naraščal delež prebivalcev, ki so uporabljali internet. Rast je bila večja v državah z vejimi točkami in manjša v državah z manjšimi točkami. Opazimo (pričakovano), da so države, v katerih že zdaj veliko uporaljajo internet, rastle počasneje kot razvijajoče.
+
+```{r vizualizacija, echo=FALSE, message=FALSE, fig.align='center', warning = FALSE}
 source("vizualizacija/vizualizacija.r", encoding = "UTF-8")
+zema <- ggplot() + geom_polygon(data = tess %>% filter(long > -30), aes(x = long, y = lat, group = group, fill = `Uporaba interneta`)) +
+  geom_point(data = tess  %>% filter(long > -20, lat > 30, lat < 78) %>% group_by(id) %>% summarise(x = mean(long), y = mean(lat), Koeficient = max(Koeficient)), aes(x = x, y = y, size = Koeficient), color="gray") + coord_map(xlim = c(-25, 40), ylim = c(32, 72)) + scale_size(name = "Hitrost naraščanja", range = c(0.2, 2)) + scale_fill_continuous(na.value = "white")
+print(zema)
+```  
+
+Oglejmo si še, koliko so prebivalci evropskih držav kupovali stvari preko interneta.
+
+```{r histogram, echo=FALSE, message=FALSE, fig.align='center', warning = FALSE}
+hist(rezultati$Kupovanje, col=rgb(1,0,0,0.5), xlim=c(0,100), ylim=c(0,10), breaks=10, main='Kupovanje po internetu', xlab="delez prebivalstva", ylab="stevilo drzav")
+hist(rezultati$`Kupovanje-tujina`, col=rgb(0,0,1,0.5), xlim=c(0,100), ylim=c(0,10), add=T, main='Kupovanje po internetu', xlab="delez prebivalstva", ylab="stevilo drzav")
+box()
+legend("topright", c("doma", "iz tujine"), col=c(rgb(1,0,0,0.5), rgb(0,0,1,0.5)), lwd=10)
 ```
 
-Na spodnjem zemljevidu si oglejmo uporabo interneta v letu 2016 po državah. Sive točke na državah pokažejo, kako hitro je v zadnjih letih 
-naraščalo število prebivalcev, ki so uporabljali internet. Rast je bila večja v državah z vejimi točkami in manjša v državah z manjšimi točkami. Opazimo (pričakovano), da so države, v katerih že zdaj veliko uporaljajo internet, rastle počasneje kot razvijajoče.
+Iz zgornjega histograma razberemo, da so si države pri kupovanju po internetu zelo različne. Pri kupovanju iz tujine močno izstopa ena država in sicer Luksemburg, kjer tudi v splošnem uporabljajo internet največ.
 
+```{r, echo=FALSE, fig.align='center', warning = FALSE}
+head(rezultati[-c(5, 6, 7)][order(rezultati$`Kupovanje-tujina`, decreasing=TRUE),])
+```
+
+Se pa države manj razlikujejo med seboj pri kupovanju iz tujine. To potrjuje tudi primerjava standardnih odklonov na naših podatkih:
+
+```{r, eval=TRUE, warning = FALSE}
+standardni_odklon_doma = sd(rezultati$Kupovanje)
+standardni_odklon_tujina = sd(rezultati$`Kupovanje-tujina`)
+standardni_odklon_doma
+standardni_odklon_tujina
+```
+
+Da preverimo hipotezo, da bolj razvite države več uporabljajo internet in da več kupujejo z njegovo pomočjo, si pomagajmo z tabelo korelacijskih koeficientov.
+
+```{r, eval=TRUE, echo = FALSE, warning = FALSE}
+cor(rezultati[-c(1, 4, 5)])
+```
+
+Zelo očitno je splošna uporaba interneta dobra napoved za to, koliko bodo uporabniki kupovali po njem. Prav tako pa ima BDP na prebivalca (zadnji stolpec) močno korelacijo z uporabo interneta. Zanimivo, število prebivalcev države nam ne pove veliko o katerikoli drugi količini.
 ***
-```{r zemljevid, echo=FALSE, fig.align='center',  warning = FALSE, fig.cap='Zemljevid porabe interneta v Evropi'} 
-zema <- ggplot() + geom_polygon(data = tess ,aes(x = long, y = lat, group = group), fill=tess$`Uporaba interneta`)+coord_map()+geom_point(data=tess, aes(x=long, y=lat,group=1,fill=1, size=tess$Koeficient), color="gray")+coord_map(xlim = c(-25, 40), ylim = c(32, 72))+scale_size(name="T",range=c(0.2,1)) +scale_fill_identity(na.value = "white")
-print(zema)
+
 ```
