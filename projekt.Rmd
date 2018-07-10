@@ -10,9 +10,6 @@ output:
 ---
 
 ```{r setup, echo=FALSE, results='hide', message=FALSE, warning = FALSE}
-# Če želimo nastaviti pisave v PDF-ju, odkomentiramo
-# in sledimo navodilom v programu.
-#source("fontconfig.r", encoding = "UTF-8")
 
 # Uvoz vseh potrebnih knjižnic
 source("lib/libraries.r", encoding = "UTF-8")
@@ -20,7 +17,7 @@ source("lib/libraries.r", encoding = "UTF-8")
 
 # Izbira teme
 
-Pri projektu bom preučil, koliko in v kakšni obliki ljudje iz Evropske Uniji uporabljajo internet. Moja hipoteza je, da ljudje v bolj razvitih državah uporabljajo internet več in preko interneta tudi več kupujejo. Z analizo podatkov bom želel to hipotezo potrditi ali ovreči.
+Pri projektu sem preučil, koliko in v kakšni obliki ljudje iz Evropske Uniji uporabljajo internet. Moja hipoteza je, da ljudje v bolj razvitih državah uporabljajo internet več in preko interneta tudi več kupujejo. Z analizo podatkov bom želel to hipotezo potrditi ali ovreči.
 
 ***
 
@@ -30,32 +27,33 @@ Pri projektu bom preučil, koliko in v kakšni obliki ljudje iz Evropske Uniji u
 source("uvoz/uvoz.r", encoding = "UTF-8")
 ```
 
-Uvozil sem podatke o državah EU v obliki CSV iz spletnega portala "eurostat" ter v obliki HTML z Wikipedije. Podatke imamo v 4 razpredelnicah v obliki *tidy data*.
+Uvozil sem podatke o državah EU v obliki CSV iz spletnega portala "eurostat" ter v obliki HTML z Wikipedije. Podatke imamo v 5 razpredelnicah v obliki *tidy data*.
 
 Podatki v tidy data:
-1. tabela: delež uporabnikov 
-stolpci: država EU, leto, vrsta uporabe (doma, WI-FI), delež
 
-2. tabela: nakupi
-stolpci: država EU, leto, doma ali v tujini, delež
+1. tabela: delež uporabnikov
 
-3. tabela: število uporabnikov Facebooka
-stolpci: država EU, število uporabnikov Facebooka
+stolpci: država EU, leto, delež uporabnikov interneta
 
-4. tabela: razvitost držav
+2. tabela: delež uporabnikov WIFI
+
+stolpci: država EU, leto, delež uporabnikov WIFI
+
+3. tabela: nakupi doma
+
+stolpci: država EU, leto, delež potrošnikov doma
+
+4. tabela: nakupi iz tujine
+
+stolpci: država EU, leto, delež potrošnikov - tujina
+
+5. tabela: razvitost držav
+
 stolpci: država EU, število prebivalcev, BDP na prebivalca
 
 
-
-<!-- *** -->
-
-<!-- # Analiza in vizualizacija podatkov -->
-
-<!-- ```{r vizualizacija, echo=FALSE, message=FALSE, warning=FALSE} -->
-<!-- source("vizualizacija/vizualizacija.r", encoding = "UTF-8") -->
-<!-- ``` -->
-
-Spodnji grafi prikazujejo krivuljo rasti uporabe interneta skozi čas. Prvi prikazuje rast po celotni Evropi, drugi v Slovaški, ki se kot država najbolj približuje povprečkju, tretji v Turčiji, kjer internet uporabljajo najmanj in zadnji Luksemburg, kjer internet uporabljajo največ.
+# Analiza podatkov
+Analizo podatkov sem začel s pregledom splošne uporabe interneta po državah. Ta je skozi leta pričakovano v skoraj vseh državah naraščala. Spodnji grafi prikazujejo krivuljo rasti uporabe interneta skozi čas. Prvi prikazuje rast po celotni Evropi, drugi v Slovaški, ki se kot država najbolj približuje evropskem povprečju, tretji v Turčiji, kjer internet uporabljajo najmanj in zadnji Luksemburg, kjer internet uporabljajo največ.
 
 ***
 ```{r grafi, echo=FALSE, fig.align='center',  warning = FALSE, fig.cap='Graf uporabe interneta po letih za celotno Evropo, Slovaško, Turčijo in Luksembug'}
@@ -69,52 +67,71 @@ graf2<-ggplot()+geom_line(data=luxemburg, aes(x=luxemburg$Leto, y=luxemburg$`Upo
   ggtitle("Luksemburg")+labs(x="Leto", y="Delez uporabnikov v %")+coord_cartesian(ylim = c(0, 100)) 
 grid.arrange(graf1, graf4, graf3, graf2)
 ```
-
-```{r uvozi.zem, echo=FALSE, message=FALSE, fig.align='center', warning = FALSE}
-source("lib/uvozi.zemljevid.r", encoding = "UTF-8")
-```
-
-Na spodnjem zemljevidu si oglejmo uporabo interneta v letu 2016 po državah. Sive točke na državah pokažejo, kako je v zadnjih letih 
-naraščal delež prebivalcev, ki so uporabljali internet. Rast je bila večja v državah z vejimi točkami in manjša v državah z manjšimi točkami. Opazimo (pričakovano), da so države, v katerih že zdaj veliko uporaljajo internet, rastle počasneje kot razvijajoče.
+Vidimo, da se delež uporabnikov zelo razlikuje med topogledno najbolj razvito državo - Luksemburgom in najmanj razvito - Turčijo. Oglejmo si zemljevid, ki prikazuje, koliko so v letu 2016 države v Evropi uporabljale internet. Sive točke na državah prikazujejo, kako hitro je v zadnjih letih
+naraščal delež prebivalcev, ki so uporabljali internet. Velikost točke je odvisna od vodilnega koeficienta regresijske premice. Rast je bila večja v državah z večjimi točkami in manjša v državah z manjšimi točkami. Opazimo (pričakovano), da so države, v katerih že zdaj veliko uporaljajo internet, rasle počasneje kot razvijajoče se države.
 
 ```{r vizualizacija, echo=FALSE, message=FALSE, fig.align='center', warning = FALSE}
+source("lib/uvozi.zemljevid.r", encoding = "UTF-8")
 source("vizualizacija/vizualizacija.r", encoding = "UTF-8")
 zema <- ggplot() + geom_polygon(data = tess %>% filter(long > -30), aes(x = long, y = lat, group = group, fill = `Uporaba interneta`)) +
   geom_point(data = tess  %>% filter(long > -20, lat > 30, lat < 78) %>% group_by(id) %>% summarise(x = mean(long), y = mean(lat), Koeficient = max(Koeficient)), aes(x = x, y = y, size = Koeficient), color="gray") + coord_map(xlim = c(-25, 40), ylim = c(32, 72)) + scale_size(name = "Hitrost naraščanja", range = c(0.2, 2)) + scale_fill_continuous(na.value = "white")
 print(zema)
 ```  
 
-Oglejmo si še, koliko so prebivalci evropskih držav kupovali stvari preko interneta.
+Sedaj si poglejmo še, koliko so prebivalci evropskih držav kupovali stvari preko interneta. Rezultati za evropske države so prikazane v histogramu.
 
-```{r histogram, echo=FALSE, message=FALSE, fig.align='center', warning = FALSE}
+```{r histogram, echo=FALSE, message=FALSE, fig.align='center', warning = FALSE, fig.cap='Histogram kupovanja po internetu'}
 hist(rezultati$Kupovanje, col=rgb(1,0,0,0.5), xlim=c(0,100), ylim=c(0,10), breaks=10, main='Kupovanje po internetu', xlab="delez prebivalstva", ylab="stevilo drzav")
 hist(rezultati$`Kupovanje-tujina`, col=rgb(0,0,1,0.5), xlim=c(0,100), ylim=c(0,10), add=T, main='Kupovanje po internetu', xlab="delez prebivalstva", ylab="stevilo drzav")
 box()
 legend("topright", c("doma", "iz tujine"), col=c(rgb(1,0,0,0.5), rgb(0,0,1,0.5)), lwd=10)
 ```
 
-Iz zgornjega histograma razberemo, da so si države pri kupovanju po internetu zelo različne. Pri kupovanju iz tujine močno izstopa ena država in sicer Luksemburg, kjer tudi v splošnem uporabljajo internet največ.
+Iz zgornjega histograma razberemo, da so si države pri kupovanju po internetu zelo različne. Pri kupovanju iz tujine močno izstopa ena država in sicer Luksemburg s 70 odstotki. Ostale države se gibajo med 1 in 45 odstotki. Pri kupovanju doma pa sta na prvem mestu Velika Britanija in Danska z dobirmi 80 odstotki.
 
-```{r, echo=FALSE, fig.align='center', warning = FALSE}
-head(rezultati[-c(5, 6, 7)][order(rezultati$`Kupovanje-tujina`, decreasing=TRUE),])
-```
-
-Se pa države manj razlikujejo med seboj pri kupovanju iz tujine. To potrjuje tudi primerjava standardnih odklonov na naših podatkih:
+Iz histograma pa je tudi jasno, da se države med seboj manj razlikujejo pri kupovanju iz tujine kot pri kupovanju na splošno. To potrjuje tudi primerjava standardnih odklonov na naših podatkih:
 
 ```{r, eval=TRUE, warning = FALSE}
-standardni_odklon_doma = sd(rezultati$Kupovanje)
-standardni_odklon_tujina = sd(rezultati$`Kupovanje-tujina`)
+standardni_odklon_doma <- sd(rezultati$Kupovanje)
 standardni_odklon_doma
+
+standardni_odklon_tujina <- sd(rezultati$`Kupovanje-tujina`)
 standardni_odklon_tujina
 ```
 
 Da preverimo hipotezo, da bolj razvite države več uporabljajo internet in da več kupujejo z njegovo pomočjo, si pomagajmo z tabelo korelacijskih koeficientov.
 
 ```{r, eval=TRUE, echo = FALSE, warning = FALSE}
-cor(rezultati[-c(1, 4, 5)])
+cor(rezultati[-c(1, 4, 5, 8)])
 ```
 
 Zelo očitno je splošna uporaba interneta dobra napoved za to, koliko bodo uporabniki kupovali po njem. Prav tako pa ima BDP na prebivalca (zadnji stolpec) močno korelacijo z uporabo interneta. Zanimivo, število prebivalcev države nam ne pove veliko o katerikoli drugi količini.
+
+Zanimalo me je tudi, katere države so si po podatkih, zbranih v tabeli z rezultati za 2016, med seboj najbolj podobne. Zato sem jih z metodo *k*-voditeljev vmestil v 5 različnih skupin. Metoda predpostavi, da imamo *n* podatkov, ki jih želimo razvrstiti v *k* disjunktnih gruč, tako da so elementi v posamezni gruči bolj podobni ostalim elementom v isti gruči kot tistim v ostalih gručah. Na spodnjem zemljevidu so države, ki so pripadle isti gruči, pobarvane enako.
+
+```{r grupe, echo=FALSE, message=FALSE, fig.align='center', warning = FALSE, fig.cap='Zemljevid držav, razdeljenih v 5 disjunktnih gruč'}
+grupi<- ggplot() + geom_polygon(data = pogrupah, aes(x = long, y = lat, group = group), fill=pogrupah$grupe)+coord_map()+coord_map(xlim = c(-25, 40), ylim = c(32, 72))+scale_size(name="T",range=c(0.2,1)) +scale_fill_identity(na.value = "white")
+print(grupi)
+```  
+Zanimivo je, da sosednje države po večini pripadajo isti gruči. Še bolj pa me je presenetilo, da je Luksemburg zasedel povsem svojo gručo, saj po podatkih tako zelo izstopa od ostalih evropskih držav. Zato si oglejmo razvoj uporabe interneta Luksemburga od leta 2008.
+
+```{r luks, echo=FALSE, message=FALSE, fig.align='center',  warning = FALSE, fig.cap='Razvoj uporabe interneta v Luksemburgu'}
+grafluks<-ggplot()+geom_line(data=luks, aes(x=Leto, y=luks$`Uporaba interneta`, colour="blue"))+geom_line(data=luks, aes(x=Leto, y=luks$Kupovanje, colour="red"))+geom_line(data=luks, aes(x=Leto, y=luks$`Kupovanje-tujina`, colour="green"))+ylim(0,100)+
+  geom_smooth(data=luks, method="lm", aes(x=Leto, y=luks$`Uporaba interneta`, colour="blue"), se=FALSE, fullrange=TRUE)+geom_smooth(data=luks, method="lm", aes(x=Leto, y=luks$Kupovanje, colour="red"), se=FALSE, fullrange=TRUE)+
+  geom_smooth(data=luks, method="lm", aes(x=Leto, y=luks$`Kupovanje-tujina`, colour="green"), se=FALSE, fullrange=TRUE)+
+  scale_colour_manual(name = 'Legenda', values =c('blue'='blue', 'red'='red', 'green'='green'), labels = c('uporaba interneta','kupovanje iz tujine', 'kupovanje doma'))+labs(y = "Odstotek drzavljanov")
+print(grafluks)
+```
+Na grafu vidimo, kako se je gibal odstotek državljanov Luksemburga, ki uporabljajo internet (modra), tistih, ki po internetu kupujejo (rdeča) in tistih, ki po internetu kupujejo iz tujine (zelena). Poleg te krivulje je na grafu prikazana tudi regresijska premica, s pomočjo katere lahko napovemo gibanje deleža v prihodnje.
+```{r, eval=TRUE, warning = FALSE}
+last(predict(lm(data=luks, `Uporaba interneta` ~ Leto)))
+last(predict(lm(data=luks, Kupovanje ~ Leto)))
+last(predict(lm(data=luks, `Kupovanje-tujina` ~ Leto)))
+```
+V letu 2017 lahko po tem modelu torej pričakujemo, da bo 98,7 odstotka Luksemburžanov uporabljalo internet, 80,6 jih bo kupovalo preko njega, 71,6 pa jih bo kupovalo iz tujine. Seveda pa za naslednja leta ni zmeraj smiselno uporabljati linearni model, ko so odstotki že visoki.
+
+# Zaključek
+Po pregledu in analizi podatkov lahko potrdim svojo hipotezo iz uvoda in sicer, da v državah z višjim BDP-jem ljudje uporabljajo internet več in da s pomočjo interneta tudi več kupujejo. Zato ni čudno, da je med državami zmeraj znova izstopal Luksemburg, ki ima največji BDP med evropskimi državami. Po drugi strani se je na dno uvrstila Turčija. Slovenija ni v nobeni kategoriji izstopala, v grupiranju po gručah pa je uvrščena skupaj s svojimi sosedami. Odstotek uporabnikov interneta se po vseh državah Evrope zanesljivo veča, tako da pričakujem, da se bodo sčasoma razlike med najbolj in najmanj razvitimi državami manjšale.
 ***
 
 ```

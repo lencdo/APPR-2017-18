@@ -124,7 +124,3 @@ rezultati$`Kupovanje-tujina`<-as.character(rezultati$`Kupovanje-tujina`)
 rezultati$`Kupovanje-tujina`<-as.numeric(rezultati$`Kupovanje-tujina`)
 rezultati$`st. prebivalcev`<-as.numeric(rezultati$`st. prebivalcev`)
 
-#kapadia<-left_join(evropap, korelacija, by=c("SOVEREIGNT" = "Drzava"))
-
-#dzojnano<-left_join(evropa, korelacija)
-#grid.arrange(graf1, graf2, graf3, graf4)

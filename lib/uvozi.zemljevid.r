@@ -58,19 +58,6 @@ uvozi.zemljevid <- function(url, pot.zemljevida, mapa = "../zemljevidi",
   return(zemljevid)
 }
 
-# Primer uvoza zemljevida (slovenske občine)
-# obcine <- uvozi.zemljevid("http://baza.fmf.uni-lj.si/OB.zip",
-#                           "OB/OB", encoding = "Windows-1250")
-
-# Funkcija pretvori.zemljevid(podatki, zemljevid, stolpec, novi = NULL)
-#
-# Funkcija pretvori zemljevid v obliko, ki jo lahko uporabimo pri risanju z ggplot2.
-#
-# Parametri:
-#   * zemljevid       Zemljevid, ki ga pretvarjami.
-#
-# Vrača:
-#   * razpredelnico s podatki iz zemljevida, ki jo lahko uporabimo z ggplot2
 pretvori.zemljevid <- function(zemljevid) {
   fo <- fortify(zemljevid)
   data <- zemljevid@data
