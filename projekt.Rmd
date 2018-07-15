@@ -81,10 +81,10 @@ print(zema)
 Sedaj si poglejmo še, koliko so prebivalci evropskih držav kupovali stvari preko interneta. Rezultati za evropske države so prikazane v histogramu.
 
 ```{r histogram, echo=FALSE, message=FALSE, fig.align='center', warning = FALSE, fig.cap='Histogram kupovanja po internetu'}
-hist(rezultati$Kupovanje, col=rgb(1,0,0,0.5), xlim=c(0,100), ylim=c(0,10), breaks=10, main='Kupovanje po internetu', xlab="delez prebivalstva", ylab="stevilo drzav")
-hist(rezultati$`Kupovanje-tujina`, col=rgb(0,0,1,0.5), xlim=c(0,100), ylim=c(0,10), add=T, main='Kupovanje po internetu', xlab="delez prebivalstva", ylab="stevilo drzav")
-box()
-legend("topright", c("doma", "iz tujine"), col=c(rgb(1,0,0,0.5), rgb(0,0,1,0.5)), lwd=10)
+ggplot(tidy %>% filter(Leto == 2016, Meritev != "Uporaba interneta"),
+       aes(x = Delez, fill = Meritev)) +
+  geom_histogram(position = "dodge", breaks = seq(0, 100, 10)) +
+  scale_x_continuous(breaks = seq(0, 100, 20)) + labs(y="Stevilo drzav")
 ```
 
 Iz zgornjega histograma razberemo, da so si države pri kupovanju po internetu zelo različne. Pri kupovanju iz tujine močno izstopa ena država in sicer Luksemburg s 70 odstotki. Ostale države se gibajo med 1 in 45 odstotki. Pri kupovanju doma pa sta na prvem mestu Velika Britanija in Danska z dobirmi 80 odstotki.
@@ -132,6 +132,3 @@ V letu 2017 lahko po tem modelu torej pričakujemo, da bo 98,7 odstotka Luksembu
 
 # Zaključek
 Po pregledu in analizi podatkov lahko potrdim svojo hipotezo iz uvoda in sicer, da v državah z višjim BDP-jem ljudje uporabljajo internet več in da s pomočjo interneta tudi več kupujejo. Zato ni čudno, da je med državami zmeraj znova izstopal Luksemburg, ki ima največji BDP med evropskimi državami. Po drugi strani se je na dno uvrstila Turčija. Slovenija ni v nobeni kategoriji izstopala, v grupiranju po gručah pa je uvrščena skupaj s svojimi sosedami. Odstotek uporabnikov interneta se po vseh državah Evrope zanesljivo veča, tako da pričakujem, da se bodo sčasoma razlike med najbolj in najmanj razvitimi državami manjšale.
-***
-
-```

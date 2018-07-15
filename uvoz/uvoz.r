@@ -60,6 +60,17 @@ colnames(zanima1)<-c("Drzava", "GDP pc")
 zanima1$Drzava<-as.character(zanima1$Drzava)
 zanima1$`GDP pc`<-as.numeric(gsub(",", ".", zanima1$`GDP pc`))
 
+
+tidy <- rbind(uporaba %>% transmute(Drzava, Leto, Meritev = "Uporaba interneta",
+                                    Delez = `Uporaba interneta`),
+              kupovanje %>% transmute(Drzava, Leto, Meritev = "Kupovanje",
+                                      Delez = `Kupovanje`),
+              kupovanjeT %>% transmute(Drzava, Leto, Meritev = "Kupovanje - tujina",
+                                       Delez = `Kupovanje-tujina`)) %>%
+  mutate(Leto = parse_number(Leto), Delez = parse_number(Delez, na = ":"))
+tidy$Meritev<-gsub("Kupovanje*$", "Kupovanje - doma", tidy$Meritev)
+#tidy<-gsub("Kupovanje*$", "Kupovanje - doma", tidy$Meritev)
+
 # poglejmo kaj se dogaja pri uporabi, zanima nas od wifi dalje
 nova<-left_join(uporaba, wifi)
 nova<-subset(nova, nova$Leto>=2012)
